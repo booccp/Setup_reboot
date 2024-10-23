@@ -34,6 +34,30 @@ else
   exit 1
 fi
 
+# 检查并安装cron包
+green_echo "检查是否安装cron包..."
+if ! command -v crontab &> /dev/null; then
+  red_echo "未安装cron包，正在安装..."
+  if [ "$OS" = "Debian" ]; then
+    apt-get update && apt-get install -y cron
+  elif [ "$OS" = "CentOS" ]; then
+    yum update && yum install -y cronie
+  fi
+  green_echo "cron包安装完成。"
+else
+  green_echo "已安装cron包。"
+fi
+
+# 启动并启用cron服务
+green_echo "启动并启用cron服务..."
+if [ "$OS" = "Debian" ]; then
+  systemctl start cron
+  systemctl enable cron
+elif [ "$OS" = "CentOS" ]; then
+  systemctl start crond
+  systemctl enable crond
+fi
+
 # 设置时区为东八区（香港时间）
 green_echo "设置时区为东八区（香港时间）..."
 timedatectl set-timezone Asia/Hong_Kong
